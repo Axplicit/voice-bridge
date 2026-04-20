@@ -335,7 +335,7 @@ export function initSocket(httpServer) {
     // yahan server Google translate use karke text return karta hai.
     socket.on('translateChatMessage', async (data, callback) => {
       try {
-        const { text, toLang, fromLang = 'auto' } = data || {};
+        const { text, toLang, fromLang = null } = data || {};
         if (!text || !toLang) {
           return callback?.({ success: false, text });
         }
