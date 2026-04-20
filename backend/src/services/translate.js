@@ -12,22 +12,23 @@ const LANG_MAP = {
   ar: 'ar',
 };
 
-const MYMEMORY_BASE_URL = 'https://api.mymemory.translated.net/get';
+const GOOGLE_TRANSLATE_URL = 'https://translation.googleapis.com/language/translate/v2';
 
-/**
- * Translate text using MyMemory Translation API (free, no authentication required)
- * @param {string} text - Text to translate
- * @param {string} fromCode - Source language code (UR, EN, AR, ur-PK, en-US, ar-SA, etc.)
- * @param {string} toCode - Target language code
- * @returns {Promise<{text: string, success: boolean}>} Translated text and success flag
- */
 export async function translateText(text, fromCode, toCode) {
+  console.log('[Translate DEBUG] called with:', { fromCode, toCode, text: text?.substring(0, 30) });
+
   if (!text || !text.trim()) {
     return { text, success: true };
   }
 
+  const apiKey = process.env.GOOGLE_API_KEY_TRANSLATION;
+  if (!apiKey) {
+    logger.error('Translate', 'GOOGLE_API_KEY_TRANSLATION is not set');
+    return { text, success: false };
+  }
+
   const normalizedFrom = (fromCode ?? '').toString().trim();
-  const normalizedTo = (toCode ?? '').toString().trim();
+  const normalizedTo   = (toCode   ?? '').toString().trim();
 
   const from = normalizedFrom && normalizedFrom.toLowerCase() !== 'auto'
     ? (LANG_MAP[normalizedFrom] ?? normalizedFrom.toLowerCase())
@@ -39,38 +40,44 @@ export async function translateText(text, fromCode, toCode) {
     return { text, success: false };
   }
 
-  // If same language, skip translation
-  if (from === to) {
+  if (from && from === to) {
     logger.info('Translate', `Same language (${from}), skipping translation`);
     return { text, success: true };
   }
 
   try {
-    // Build language pair string (e.g., "ur|en" or "en|ur")
-    const langPair = from ? `${from}|${to}` : `auto|${to}`;
-
-    // Build query URL
-    let url = `${MYMEMORY_BASE_URL}?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-
-    // Optionally add email for higher quota (50k chars/day instead of 10k)
-    const email = process.env.MYMEMORY_EMAIL;
-    if (email) {
-      url += `&de=${encodeURIComponent(email)}`;
+    const body = {
+      q:      text,
+      target: to,
+      format: 'text',
+    };
+    if (from) {
+      body.source = from;
     }
 
-    const res = await fetch(url);
+    const res = await fetch(`${GOOGLE_TRANSLATE_URL}?key=${apiKey}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '(no body)');
+      logger.error('Translate', `Google API HTTP ${res.status}: ${errText}`);
+      return { text, success: false };
+    }
+
     const data = await res.json();
+    const translated = data?.data?.translations?.[0]?.translatedText;
 
-    // MyMemory returns 200 for successful requests, with responseStatus indicating translation status
-    if (data.responseStatus === 200) {
-      const translation = data.responseData?.translatedText ?? '';
-      logger.info('Translate', `MyMemory: "${text}" (${fromCode}) → "${translation}" (${toCode})`);
-      return { text: translation, success: true };
+    if (!translated) {
+      logger.error('Translate', 'Google API returned no translatedText', JSON.stringify(data));
+      return { text, success: false };
     }
 
-    // responseStatus 400-599 indicates an error
-    logger.error('Translate', `MyMemory error (${data.responseStatus}): ${data.responseDetails}`);
-    return { text, success: false };
+    logger.info('Translate', `"${text.substring(0, 40)}" (${fromCode}) → "${translated.substring(0, 40)}" (${toCode})`);
+    return { text: translated, success: true };
+
   } catch (err) {
     logger.error('Translate', `Failed: ${err.message}`);
     return { text, success: false };
