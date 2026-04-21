@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const MONGO_URI = process.env.MONGO_URI;
-const DB_NAME = "voice-bridge";
+const DB_NAME = "voicebridge";
 
 export const connectDB = async () => {
   if (!MONGO_URI || !MONGO_URI.startsWith("mongodb")) {
