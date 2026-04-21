@@ -15,7 +15,6 @@ const LANG_MAP = {
 const GOOGLE_TRANSLATE_URL = 'https://translation.googleapis.com/language/translate/v2';
 
 export async function translateText(text, fromCode, toCode) {
-  console.log('[Translate DEBUG] called with:', { fromCode, toCode, text: text?.substring(0, 30) });
 
   if (!text || !text.trim()) {
     return { text, success: true };
