@@ -3,7 +3,6 @@ import type { AuthUser } from '@/api/auth';
 
 const AUTH_USER_KEY = 'voice_bridge_user';
 
-// In-memory fallback for React Native (no sessionStorage on native)
 let memoryStore: string | null = null;
 
 function getSessionStorage(): Storage | null {
@@ -19,11 +18,11 @@ export function getSessionUser(): AuthUser | null {
     const raw = storage ? storage.getItem(AUTH_USER_KEY) : memoryStore;
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed.userId === 'string' && typeof parsed.name === 'string') {
-      return { 
-        _id: parsed._id || '', 
-        userId: parsed.userId, 
-        name: parsed.name 
+    if (parsed && typeof parsed.userId === 'string') {
+      return {
+        _id: parsed._id || '',
+        userId: parsed.userId,
+        name: parsed.name
       };
     }
     return null;
@@ -39,6 +38,9 @@ export function setSessionUser(user: AuthUser): void {
     storage.setItem(AUTH_USER_KEY, raw);
   } else {
     memoryStore = raw;
+    import('@react-native-async-storage/async-storage').then(({ default: AsyncStorage }) => {
+      AsyncStorage.setItem(AUTH_USER_KEY, raw);
+    });
   }
 }
 
@@ -48,5 +50,29 @@ export function clearSessionUser(): void {
     storage.removeItem(AUTH_USER_KEY);
   } else {
     memoryStore = null;
+    import('@react-native-async-storage/async-storage').then(({ default: AsyncStorage }) => {
+      AsyncStorage.removeItem(AUTH_USER_KEY);
+    });
+  }
+}
+
+export async function loadSessionUserFromStorage(): Promise<AuthUser | null> {
+  if (Platform.OS === 'web') return null;
+  try {
+    const { default: AsyncStorage } = await import('@react-native-async-storage/async-storage');
+    const raw = await AsyncStorage.getItem(AUTH_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed.userId === 'string') {
+      memoryStore = raw;
+      return {
+        _id: parsed._id || '',
+        userId: parsed.userId,
+        name: parsed.name
+      };
+    }
+    return null;
+  } catch {
+    return null;
   }
 }

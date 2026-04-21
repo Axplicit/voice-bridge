@@ -2,9 +2,8 @@ import * as React from 'react';
 import { createContext } from 'react';
 import type { AuthUser } from '@/api/auth';
 import { signInApi, signUpApi } from '@/api/auth';
-import { getSessionUser, setSessionUser, clearSessionUser } from '@/utils/sessionStorage';
+import { getSessionUser, setSessionUser, clearSessionUser, loadSessionUserFromStorage } from '@/utils/sessionStorage';
 
-// Type assertion for React hooks (Expo/RN types may not expose them on React namespace)
 const useReact = React as typeof React & {
   useState: <S>(s: S | (() => S)) => [S, (s: S | ((prev: S) => S)) => void];
   useEffect: (effect: () => void | (() => void), deps?: unknown[]) => void;
@@ -17,7 +16,7 @@ type AuthContextType = {
   isLoading: boolean;
   isInitialized: boolean;
   signIn: (userId: string, password: string) => Promise<{ success: boolean; message: string }>;
-  signUp: (userId: string, password: string) => Promise<{ success: boolean; message: string }>;
+  signUp: (userId: string, email: string, password: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 };
 
@@ -32,10 +31,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useReact.useEffect(() => {
     const stored = getSessionUser();
-    if (stored) {
+    if (stored && stored._id) {
       setUser(stored);
+      setIsInitialized(true);
+    } else {
+      loadSessionUserFromStorage().then((asyncStored) => {
+        if (asyncStored) setUser(asyncStored);
+        setIsInitialized(true);
+      });
     }
-    setIsInitialized(true);
   }, []);
 
   const signIn = useReact.useCallback(async (userId: string, password: string) => {
@@ -57,10 +61,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const signUp = useReact.useCallback(async (userId: string, password: string) => {
+  const signUp = useReact.useCallback(async (userId: string, email: string, password: string) => {
     setIsLoading(true);
     try {
-      const res = await signUpApi({ userId, password });
+      const res = await signUpApi({ userId, email, password });
       if (res.status) {
         return { success: true, message: res.message };
       }

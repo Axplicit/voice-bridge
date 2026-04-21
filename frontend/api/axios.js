@@ -37,13 +37,13 @@ const getApiUrl = () => {
   }
 
   if (Platform.OS === "web") {
-    const url = `http://localhost:3000/api/v1`;
+    const url = `https://voice-bridge-brva.onrender.com/api/v1`;
     console.log('[API] Web browser backend:', url);
     return url;
   }
 
   console.warn('[API] Could not detect backend URL, falling back to localhost');
-  return "http://localhost:3000/api/v1";
+  return "https://voice-bridge-brva.onrender.com/api/v1";
 };
 // Main shared axios instance used across the app
 export const axiosInstance = axios.create({
