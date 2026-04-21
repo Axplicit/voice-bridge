@@ -917,7 +917,7 @@ export default function App() {
   const { startListening, stopListening } = useSpeechRecognition();
   const { startRecording, stopRecording, setTtsPlaying, warmUpAudio } = useVADAudioRecorder();
   const {
-    pairedDevices: btDevices,
+  pairedDevices: btDevices,
   scannedDevices: btScannedDevices,
   connectedDeviceId: btConnectedId,
   connectState: btConnectState,

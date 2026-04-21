@@ -15,17 +15,19 @@ import {
 import * as FileSystemLegacy from 'expo-file-system/legacy';
 import { voiceSetupApi } from '@/api/user';
 
+// ── Warm Earth Palette ────────────────────────────────────────────────────────
 const THEME = {
-  background: '#0F1219',
-  surface:    '#1A1F2B',
-  border:     '#2D3548',
-  primary:    '#06B6D4',
-  secondary:  '#6366F1',
+  background: '#FAF7F2',
+  surface:    '#FFFFFF',
+  border:     '#EDE5D8',
+  primary:    '#C17B3A',
+  secondary:  '#7C6C5B',
   success:    '#10B981',
-  danger:     '#F43F5E',
-  textMain:   '#F8FAFC',
-  textMuted:  '#94A3B8',
+  danger:     '#C25B4E',
+  textMain:   '#2C2018',
+  textMuted:  '#9C8E80',
 };
+// ─────────────────────────────────────────────────────────────────────────────
 
 const RECORD_DURATION_MS = 40_000;
 const MIN_DURATION_MS    = 15_000;
@@ -156,7 +158,7 @@ export function VoiceSetupScreen({ userId, onDone }: Props) {
 
   return (
     <View style={s.page}>
-      <LinearGradient colors={['#0F1219', '#07090D']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#FAF7F2', '#F0E8DC']} style={StyleSheet.absoluteFill} />
       <SafeAreaView style={s.safe}>
         <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
 
@@ -208,11 +210,11 @@ export function VoiceSetupScreen({ userId, onDone }: Props) {
               activeOpacity={canStop ? 0.8 : 1}
             >
               <LinearGradient
-                colors={canStop ? [THEME.danger, '#C0392B'] : ['#374151', '#4B5563']}
+                colors={canStop ? [THEME.danger, '#A04040'] : [THEME.border, '#D4C8B8']}
                 style={s.btnInner}
               >
-                <MicOff size={22} color="#fff" />
-                <Text style={s.btnText}>
+                <MicOff size={22} color={canStop ? '#fff' : THEME.textMuted} />
+                <Text style={[s.btnText, !canStop && { color: THEME.textMuted }]}>
                   {canStop ? 'Stop Recording' : `Keep going… ${remaining}s left`}
                 </Text>
               </LinearGradient>
@@ -288,23 +290,40 @@ export function VoiceSetupScreen({ userId, onDone }: Props) {
 }
 
 const s = StyleSheet.create({
-  page:           { flex: 1, backgroundColor: '#0F1219' },
+  page:           { flex: 1, backgroundColor: THEME.background },
   safe:           { flex: 1 },
   scroll:         { padding: 24, paddingBottom: 48 },
 
   header:         { alignItems: 'center', marginBottom: 28 },
-  iconCircle:     { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  title:          { fontSize: 24, fontWeight: '700', color: '#F8FAFC', marginBottom: 8, textAlign: 'center' },
-  subtitle:       { fontSize: 13, color: '#94A3B8', textAlign: 'center', lineHeight: 20 },
+  iconCircle:     {
+                    width: 80, height: 80, borderRadius: 40,
+                    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+                    shadowColor: THEME.primary,
+                    shadowOffset: { width: 0, height: 6 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 12,
+                    elevation: 8,
+                  },
+  title:          { fontSize: 24, fontWeight: '700', color: THEME.textMain, marginBottom: 8, textAlign: 'center' },
+  subtitle:       { fontSize: 13, color: THEME.textMuted, textAlign: 'center', lineHeight: 20 },
 
-  textCard:       { backgroundColor: '#1A1F2B', borderRadius: 14, padding: 18, marginBottom: 24, borderWidth: 1, borderColor: '#2D3548' },
-  textCardLabel:  { fontSize: 11, fontWeight: '700', color: '#06B6D4', letterSpacing: 1.5, marginBottom: 10 },
-  sampleText:     { fontSize: 15, color: '#F8FAFC', lineHeight: 25 },
+  textCard:       {
+                    backgroundColor: THEME.surface,
+                    borderRadius: 14, padding: 18, marginBottom: 24,
+                    borderWidth: 1, borderColor: THEME.border,
+                    shadowColor: THEME.secondary,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.08,
+                    shadowRadius: 6,
+                    elevation: 3,
+                  },
+  textCardLabel:  { fontSize: 11, fontWeight: '700', color: THEME.primary, letterSpacing: 1.5, marginBottom: 10 },
+  sampleText:     { fontSize: 15, color: THEME.textMain, lineHeight: 25 },
 
   progressWrap:   { marginBottom: 20 },
-  progressTrack:  { height: 6, backgroundColor: '#2D3548', borderRadius: 3, overflow: 'hidden', marginBottom: 8 },
-  progressFill:   { height: '100%', backgroundColor: '#06B6D4', borderRadius: 3 },
-  progressLabel:  { fontSize: 13, color: '#94A3B8', textAlign: 'center' },
+  progressTrack:  { height: 6, backgroundColor: THEME.border, borderRadius: 3, overflow: 'hidden', marginBottom: 8 },
+  progressFill:   { height: '100%', backgroundColor: THEME.primary, borderRadius: 3 },
+  progressLabel:  { fontSize: 13, color: THEME.textMuted, textAlign: 'center' },
 
   actionBtn:      { borderRadius: 14, overflow: 'hidden', marginBottom: 12 },
   btnDisabled:    { opacity: 0.65 },
@@ -312,22 +331,22 @@ const s = StyleSheet.create({
   btnText:        { fontSize: 16, fontWeight: '700', color: '#fff' },
 
   ghostBtn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10, marginBottom: 8 },
-  ghostText:      { fontSize: 14, color: '#94A3B8' },
+  ghostText:      { fontSize: 14, color: THEME.textMuted },
 
   centerBox:      { alignItems: 'center', paddingVertical: 28 },
-  uploadingText:  { fontSize: 16, fontWeight: '600', color: '#F8FAFC', marginTop: 16 },
-  uploadingSubText: { fontSize: 13, color: '#94A3B8', marginTop: 6 },
+  uploadingText:  { fontSize: 16, fontWeight: '600', color: THEME.textMain, marginTop: 16 },
+  uploadingSubText: { fontSize: 13, color: THEME.textMuted, marginTop: 6 },
 
   successBox:     { alignItems: 'center', paddingVertical: 16, gap: 12 },
   successIcon:    { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },
-  successTitle:   { fontSize: 22, fontWeight: '700', color: '#10B981' },
-  successDesc:    { fontSize: 14, color: '#94A3B8', textAlign: 'center', lineHeight: 21, marginBottom: 8 },
+  successTitle:   { fontSize: 22, fontWeight: '700', color: THEME.success },
+  successDesc:    { fontSize: 14, color: THEME.textMuted, textAlign: 'center', lineHeight: 21, marginBottom: 8 },
 
   errorBox:       { alignItems: 'center', paddingVertical: 16, gap: 10 },
-  errorText:      { fontSize: 14, color: '#F43F5E', textAlign: 'center', lineHeight: 20 },
+  errorText:      { fontSize: 14, color: THEME.danger, textAlign: 'center', lineHeight: 20 },
 
   skipBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, marginTop: 4 },
-  skipText:       { fontSize: 14, color: '#94A3B8' },
+  skipText:       { fontSize: 14, color: THEME.textMuted },
 
-  tip:            { fontSize: 12, color: '#64748B', textAlign: 'center', marginTop: 20, lineHeight: 18 },
+  tip:            { fontSize: 12, color: THEME.textMuted, textAlign: 'center', marginTop: 20, lineHeight: 18 },
 });

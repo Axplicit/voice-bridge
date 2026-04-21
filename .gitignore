@@ -1,2 +1,14 @@
 # Local secrets — do not commit
 .env
+
+# OS
+.DS_Store
+
+# Expo / React Native
+.expo
+frontend/.expo
+frontend/android
+
+# Cache
+*.cache
+
