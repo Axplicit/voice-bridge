@@ -134,7 +134,12 @@ export function useBluetooth() {
         await AudioSession.setActive(true);
       } else {
         const RNBluetoothClassic = require(BT_CLASSIC_MODULE).default;
-        await RNBluetoothClassic.connectToDevice(deviceId);
+        try {
+          await RNBluetoothClassic.connectToDevice(deviceId);
+        } catch (_firstAttempt: any) {
+          await new Promise(res => setTimeout(res, 1000));
+          await RNBluetoothClassic.connectToDevice(deviceId);
+        }
       }
       setConnectState('connected');
     } catch (e: any) {

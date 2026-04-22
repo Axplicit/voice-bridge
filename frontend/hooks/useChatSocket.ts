@@ -126,7 +126,7 @@ export function useChatSocket({
   const sendMessage = useCallback(
     (text: string, receiver: string, userName: string) => {
       if (!text.trim() || !receiver) return;
-      const customId = crypto.randomUUID();
+      const customId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
       const payload: ChatMessage = {
         customId,
         sender: currentUserIdRef.current,

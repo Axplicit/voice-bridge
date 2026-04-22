@@ -8,7 +8,7 @@ import { chatApi } from '@/api/chat';
 import type { Conversation } from '@/types/chat';
 import {
   StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView,
-  StatusBar, ActivityIndicator, Dimensions, Alert, Platform, Image, Modal,
+  StatusBar, ActivityIndicator, Dimensions, Alert, Platform, Image, Modal,KeyboardAvoidingView,FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -640,7 +640,7 @@ setTimeout(() => {
 
   // --- RENDERING LOGIC ---
   return (
-    <SafeAreaView style={styles.darkPage}>
+    <SafeAreaView style={[styles.darkPage, { flex: 1 }]}>
       <StatusBar barStyle="dark-content" />
 
       {/* 1. INBOX LIST VIEW */}
@@ -657,7 +657,7 @@ setTimeout(() => {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={{ paddingHorizontal: 16 }}>
+          <ScrollView style={{ paddingHorizontal: 16, flex: 1 }}>
             <Text style={{ marginTop: 15, marginBottom: 10, color: THEME.textMuted, fontSize: 11, fontWeight: '800' }}>ACTIVE BRIDGES</Text>
             {inboxLoading ? (
               <ActivityIndicator color={THEME.primary} style={{ marginTop: 30 }} />
@@ -691,6 +691,7 @@ setTimeout(() => {
         </View>
       ) : (
         /* 2. CHAT DETAIL VIEW */
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <View style={{ flex: 1 }}>
           <View style={[styles.navHeader, { borderBottomWidth: 1, borderBottomColor: THEME.border, paddingBottom: 15 }]}>
             <TouchableOpacity style={styles.backBtn} onPress={closeChat}><ChevronLeft size={24} color={THEME.textMain} /></TouchableOpacity>
@@ -702,13 +703,19 @@ setTimeout(() => {
                   ? <Text style={{ color: THEME.success, fontSize: 10, fontWeight: '700' }}>● ONLINE</Text>
                   : <Text style={{ color: THEME.textMuted, fontSize: 10, fontWeight: '700' }}>● OFFLINE</Text>
               }
-              <Text style={{ color: 'red', fontSize: 10 }}>ID: {user?._id ?? 'EMPTY'}</Text>
             </View>
             <TouchableOpacity style={styles.backBtn}><MoreVertical size={20} color={THEME.textMain} /></TouchableOpacity>
           </View>
 
-          <ScrollView ref={scrollRef} contentContainerStyle={{ padding: 20 }}>
-            {sortedMessages.map((m) => {
+          <FlatList
+            ref={scrollRef}
+            style={{ flex: 1 }}
+            contentContainerStyle={{ padding: 20, flexGrow: 1 }}
+            data={sortedMessages}
+            keyExtractor={(m) => m.customId}
+            onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+            onLayout={() => scrollRef.current?.scrollToEnd({ animated: false })}
+            renderItem={({ item: m }) => {
               const isMe = m.sender === user?._id;
               const isMenuOpen = activeMenuId === m.customId;
               return (
@@ -759,8 +766,8 @@ setTimeout(() => {
                   )}
                 </View>
               );
-            })}
-          </ScrollView>
+            }}
+          />
 
           {showInputTranslate && (
             <View style={{ position: 'absolute', bottom: 85, left: 20, backgroundColor: THEME.surface, padding: 12, borderRadius: 15, flexDirection: 'row', gap: 10, borderWidth: 1, borderColor: THEME.primary, zIndex: 1000 }}>
@@ -812,7 +819,10 @@ setTimeout(() => {
             </TouchableOpacity>
           </View>
         </View>
+        </KeyboardAvoidingView>
       )}
+
+      {/* 3. NEW CHAT MODAL */}
 
       {/* 3. NEW CHAT MODAL */}
       {showNewChatModal && (
