@@ -1,12 +1,3 @@
-/**
- * CHUNK STREAMING TEST
- *
- * Dekho ke chunking se latency kitna improve hota hai
- * Original vs Chunked comparison
- *
- * Run: node tests/chunkStreamingTest.js
- */
-
 import dotenv from 'dotenv';
 import { synthesizeSpeech } from '../src/services/tts.js';
 import { smartChunkText } from '../src/utils/ttsChunkOptimizer.js';

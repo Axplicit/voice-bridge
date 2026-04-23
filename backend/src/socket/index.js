@@ -126,7 +126,7 @@ function resolveAudioStrategy(room, senderSocketId) {
   const useClonedVoice = senderCloningEnabled && !limitReached && !!cloneVoiceId;
 
   let strategy;
-  // 🔥 RULE 1: If languages are different → NEVER passthrough
+  
   if (speakLang !== hearLang) {
     // ALWAYS translation required
     strategy = (senderCloningEnabled && cloneVoiceId && !limitReached)
@@ -137,7 +137,7 @@ function resolveAudioStrategy(room, senderSocketId) {
     if (senderCloningEnabled && cloneVoiceId && !limitReached) {
       strategy = 'cloned-tts';
     } else if (senderCloningEnabled && !cloneVoiceId) {
-      // 🔥 IMPORTANT FIX
+      
       // clone ON but NOT ready → still use TTS (NOT passthrough)
       strategy = 'tts';
     } else {

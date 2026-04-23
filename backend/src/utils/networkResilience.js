@@ -1,9 +1,3 @@
-/**
- * NETWORK RESILIENCE LAYER
- *
- * Handle network disconnects, reconnects, backpressure
- * Queue persistence, auto-retry logic
- */
 
 /**
  * Audio chunk queue with persistence

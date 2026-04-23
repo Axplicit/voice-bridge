@@ -1,8 +1,3 @@
-/**
- * CONCURRENT AUDIO PROCESSOR
- * Handles multiple users speaking simultaneously
- * Processes audio in parallel per-user queues instead of dropping chunks
- */
 
 import { transcribeAudio } from '../services/stt.js';
 import { translateText } from '../services/translate.js';

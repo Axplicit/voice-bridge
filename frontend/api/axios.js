@@ -2,24 +2,6 @@ import axios from "axios";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 
-// const getApiUrl = () => {
-//   if (process.env.EXPO_PUBLIC_API_URL) {
-//     return process.env.EXPO_PUBLIC_API_URL;
-//   }
-// };
-// export const axiosInstance = axios.create({
-//   baseURL: getApiUrl(),
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-//   timeout: 10000, 
-// });
-// export const API_BASE_URL = axiosInstance;
-
-
-
-
-
 const getApiUrl = () => {
   if (process.env.EXPO_PUBLIC_API_URL) {
     console.log('[API] Using EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
@@ -37,13 +19,13 @@ const getApiUrl = () => {
   }
 
   if (Platform.OS === "web") {
-    const url = `https://voice-bridge-brva.onrender.com/api/v1`;
+    const url = `http://localhost:3000/api/v1`;
     console.log('[API] Web browser backend:', url);
     return url;
   }
 
   console.warn('[API] Could not detect backend URL, falling back to localhost');
-  return "https://voice-bridge-brva.onrender.com/api/v1";
+  return "http://localhost:3000/api/v1";
 };
 // Main shared axios instance used across the app
 export const axiosInstance = axios.create({

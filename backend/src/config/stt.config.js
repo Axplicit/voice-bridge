@@ -1,8 +1,3 @@
-/**
- * STT (Speech-to-Text) Configuration
- * All values configurable via environment variables
- * No hardcoding - everything externalized
- */
 
 // Confidence thresholds for quality assessment
 const STT_CONFIDENCE_THRESHOLDS = {

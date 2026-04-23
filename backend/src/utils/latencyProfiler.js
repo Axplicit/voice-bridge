@@ -1,8 +1,3 @@
-/**
- * Latency Profiler - Measure and track latency across voice pipeline
- * Used for optimization and monitoring
- */
-
 export class LatencyProfiler {
   constructor(sessionId = null) {
     this.sessionId = sessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

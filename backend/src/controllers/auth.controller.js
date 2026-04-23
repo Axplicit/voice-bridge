@@ -5,34 +5,38 @@ import { sendEmailOTP } from "../email/sendEmail.js";
 export const signUp = async (req, res) => {
   try {
     const { userId, email, password } = req.body;
-    if ([userId, email, password].some((field) => typeof field !== "string" || field.trim() === "")) {
-      return res
-      .status(400)
-      .send({ status: false, message: "Missing Fields" });
+
+    console.log("SIGNUP HIT:", req.body);
+
+    if ([userId, email, password].some((f) => typeof f !== "string" || !f.trim())) {
+      return res.status(400).send({ status: false, message: "Missing Fields" });
     }
 
     const isUserExist = await User.findOne({
-      $or: [{ userId: userId }, { email: email }],
+      $or: [{ userId }, { email }],
     });
+
     if (isUserExist) {
-      return res
-        .status(409)
-        .send({ status: false, message: "User already exists" });
+      return res.status(409).send({ status: false, message: "User already exists" });
     }
 
-    // Create the user and save in DB
-    await User.create({
+    const newUser = await User.create({
       userId,
       email,
       password,
     });
-    res
-      .status(201)
-      .send({ status: true, message: "User created successfully" });
+
+    console.log("USER SAVED:", newUser);
+
+    return res.status(201).send({
+      status: true,
+      message: "User created successfully",
+      user: newUser,
+    });
+
   } catch (error) {
-    return res
-      .status(500)
-      .send({ status: false, message: error.message });
+    console.log("SIGNUP ERROR:", error);
+    return res.status(500).send({ status: false, message: error.message });
   }
 };
 

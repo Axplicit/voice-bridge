@@ -1,9 +1,3 @@
-/**
- * CONCURRENT USER LATENCY TEST
- * Measures performance when multiple users speak simultaneously
- * Run: node tests/concurrentLatencyTest.js
- */
-
 import dotenv from 'dotenv';
 import { translateText } from '../src/services/translate.js';
 import { synthesizeSpeech } from '../src/services/tts.js';
